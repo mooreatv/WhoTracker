@@ -18,37 +18,7 @@ local WT = WhoTracker
 
 -- to force debug from empty state, uncomment: (otherwise "/wt debug on" to turn on later
 -- and /reload to get it save/start over)
--- whoTrackerSaved.debug = 1
-
-function WT.Print(...)
-  DEFAULT_CHAT_FRAME:AddMessage(...)
-end
-
--- like format except simpler... just use % to replace a value that will be tostring()'ed
--- string arguments are quoted (ie "Zone") so you can distinguish nil from "nil" etc
--- and works for all types (like boolean), unlike format
-function WT.format(fmtstr, firstarg, ...)
-  local i = fmtstr:find("%%")
-  if not i then
-    return fmtstr -- no % in the format string anymore, we're done with literal value returned
-  end
-  local t = type(firstarg)
-  local s
-  if t == "string" then -- if the argument is a string, quote it, else tostring it
-    s = format("%q", firstarg)
-  else
-    s = tostring(firstarg)
-  end
-  -- emit the part of the format string up to %, the processed first argument and recurse with the rest
-  return fmtstr:sub(1, i - 1) .. s .. WT.format(fmtstr:sub(i + 1), ...)
-end
-
-function WT.Debug(...)
-  if  whoTrackerSaved and whoTrackerSaved.debug == 1 then
-    WT.Print("WhoTracker DBG: " .. WT.format(...), 0, 1, 0)
-  end
-end
-
+-- WT.debug = 1
 
 function WT.Help(msg)
   WT.Print("WhoTracker: " .. msg .. "\n" ..
@@ -97,6 +67,7 @@ function WT.Slash(arg)
   elseif arg == "debug on" then
     -- debug
     whoTrackerSaved.debug = 1
+    WT.debug = 1 -- the one actually used by MoLib
     if WT.whoLib then
       WT.whoLib:SetWhoLibDebug(true)
     end
@@ -104,6 +75,7 @@ function WT.Slash(arg)
   elseif arg == "debug off" then
     -- debug
     whoTrackerSaved.debug = nil
+    WT.debug = nil
     if WT.whoLib then
       WT.whoLib:SetWhoLibDebug(false)
     end
@@ -226,14 +198,11 @@ end
 WT.refresh = 60
 WT.prevStatus = "x"
 WT.inQueryFlag = 0
-WT.first = 1
-WT.manifestVersion = GetAddOnMetadata(addon, "Version")
 
 function WT.Init()
-  if not (WT.first == 1) then
+  if WT.MoLibInit() then -- already initialized
     return
   end
-  WT.first = 0
   -- saved vars handling
   local version = "(" .. addon .. " " .. WT.manifestVersion .. ")"
   if whoTrackerSaved == nil then
@@ -257,6 +226,11 @@ function WT.Init()
     end
   end
   WT.Debug("whoTrackerSaved = " .. WT.Dump(whoTrackerSaved))
+  if whoTrackerSaved.debug then
+    WT.debug = 1
+  else
+    WT.debug = nil
+  end
   -- end save vars
   WT:RegisterEvent("PLAYER_LOGOUT")
   WT.whoLib = nil
@@ -265,7 +239,7 @@ function WT.Init()
  end
   if WT.whoLib then
     WT.Debug("LibWho found!")
-    if whoTrackerSaved.debug then
+    if WT.debug then
       WT.whoLib:SetWhoLibDebug(true)
     end
   else
@@ -287,54 +261,6 @@ function WT.SetRegistered(...)
     WT.registered[i] = select(i, ...)
   end
 end
-
--- Start of handy poor man's "/dump" --
-
-WT.DumpT = {}
-WT.DumpT["string"] = function(into, v)
-  table.insert(into, "\"")
-  table.insert(into, v)
-  table.insert(into, "\"")
-end
-WT.DumpT["number"] = function(into, v)
-  table.insert(into, tostring(v))
-end
-WT.DumpT["boolean"] = WT.DumpT["number"]
-
-for _, t in next, {"function", "nil", "userdata"} do
-  WT.DumpT[t] = function(into, v)
-    table.insert(into, t)
-  end
-end
-
-WT.DumpT["table"] = function(into, t)
-  table.insert(into, "[")
-  local sep = ""
-  for k,v in pairs(t) do 
-    table.insert(into, sep)
-    sep = ", " -- inserts coma seperator after the first one
-    WT.DumpInto(into, k) -- so we get the type/difference betwee [1] and ["1"]
-    table.insert(into, " = ")
-    WT.DumpInto(into, v)
-  end
-  table.insert(into, "]")
-end
-
-function WT.DumpInto(into, v)
-  local type = type(v)
-   if WT.DumpT[type] then
-    WT.DumpT[type](into, v)
-   else
-    table.insert(into, "<Unknown Type " .. type .. ">")
-   end
-end
-
-function WT.Dump(v)
-   local into = {}
-   WT.DumpInto(into, v)
-   return table.concat(into, "")
-end
--- End of handy poor man's "/dump" --
 
 function WT.WhoLibCallBack(query, results, complete)
   -- WT.lastLR = results

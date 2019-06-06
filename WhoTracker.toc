@@ -6,5 +6,5 @@
 ## DefaultState: enabled
 ## SavedVariables:  whoTrackerSaved
 ## OptionalDeps: LibWho-2.0
-MoLib.lua
 WhoTracker.lua
+MoLib.lua
