@@ -2,6 +2,9 @@ ChangeLog
 
 3.0.0 June 6th 2019
 	- Switching common code to MoLib
+2.1.7 June 6th 2019
+	- Debug improvement. Removed done TODOs/WIP comments.
+	- Last version before switch to moving common code to MoLib (3.0.0)
 2.1.6 June 4th 2019
 	- Bug fix for older LibWho: use the old/original "Level" instead of the new "level" field
 2.1.5 June 4th 2019
