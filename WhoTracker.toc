@@ -7,4 +7,4 @@
 ## SavedVariables:  whoTrackerSaved
 ## OptionalDeps: LibWho-2.0
 WhoTracker.lua
-MoLib.lua
+MoLib/MoLib.lua

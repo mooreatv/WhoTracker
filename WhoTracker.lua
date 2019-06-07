@@ -225,12 +225,12 @@ function WT.Init()
       WT.Print("WhoTracker " .. version .. " loaded.  Will track \"" .. whoTrackerSaved.query .. "\" - type /wt pause to stop .")
     end
   end
-  WT.Debug("whoTrackerSaved = " .. WT.Dump(whoTrackerSaved))
   if whoTrackerSaved.debug then
     WT.debug = 1
   else
     WT.debug = nil
   end
+  WT.Debug("whoTrackerSaved = " .. WT.Dump(whoTrackerSaved))
   -- end save vars
   WT:RegisterEvent("PLAYER_LOGOUT")
   WT.whoLib = nil

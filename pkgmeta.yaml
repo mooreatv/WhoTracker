@@ -1,8 +1,10 @@
 ignore:
-    - installwt.bat
+    - *.bat
+    - MoLib/*.bat
+    - MoLib/*.toc
 
 manual-changelog: ChangeLog.txt
 
 externals:
-    MoLib.lua:
+    MoLib:
         url: https://github.com/mooreatv/MoLib
