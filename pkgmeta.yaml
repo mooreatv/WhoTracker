@@ -1,7 +1,7 @@
 ignore:
-    - *.bat
-    - MoLib/*.bat
-    - MoLib/*.toc
+    - installwt.bat
+    - MoLib/installmolib.bat
+    - MoLib/MoLib.toc
 
 manual-changelog: ChangeLog.txt
 
