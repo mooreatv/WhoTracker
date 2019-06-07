@@ -2,6 +2,7 @@ ignore:
     - installwt.bat
     - MoLib/installmolib.bat
     - MoLib/MoLib.toc
+    - MoLib/luaformat.cfg
 
 manual-changelog: ChangeLog.txt
 
