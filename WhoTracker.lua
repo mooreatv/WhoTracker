@@ -21,11 +21,9 @@ local WT = WhoTracker
 -- WT.debug = 1
 
 function WT.Help(msg)
-  WT.Print("WhoTracker: " .. msg .. "\n" ..
-   "/wt pause --   stop tracking.\n" ..
-   "/wt resume -- resume tracking\n" ..
-   "/wt query ... -- who/what to track (n-playername z-zone g-guild c-class r-race lvl1-lvl2...)\n" ..
-   "/wt history -- prints history")
+  WT.Print("WhoTracker: " .. msg .. "\n" .. "/wt pause --   stop tracking.\n" .. "/wt resume -- resume tracking\n" ..
+             "/wt query ... -- who/what to track (n-playername z-zone g-guild c-class r-race lvl1-lvl2...)\n" ..
+             "/wt history -- prints history")
 end
 
 function WT.Slash(arg)
@@ -94,7 +92,7 @@ SLASH_WhoTracker_Slash_Command1 = "/WhoTracker"
 SLASH_WhoTracker_Slash_Command2 = "/wt"
 
 function WT.OnEvent(this, event)
-  WT.Debug("called for % e=% q=% numr=% numur=%" , this:GetName(), event, WT.inQueryFlag, #WT.registered, #WT.unregistered)
+  WT.Debug("called for % e=% q=% numr=% numur=%", this:GetName(), event, WT.inQueryFlag, #WT.registered, #WT.unregistered)
   if (event == "PLAYER_LOGIN") then
     WT.Ticker() -- initial query/init
     return
@@ -121,10 +119,7 @@ function WT.OnEvent(this, event)
   for i = 1, numWhos do
     local info = C_FriendList.GetWhoInfo(i)
     local levelNum = tonumber(info.level)
-    local data = {
-      level = levelNum,
-      zone = info.area,
-    }
+    local data = {level = levelNum, zone = info.area}
     table.insert(res, data)
   end
   WT.ProcessResult(totalCount, res)
@@ -207,10 +202,8 @@ function WT.Init()
   local version = "(" .. addon .. " " .. WT.manifestVersion .. ")"
   if whoTrackerSaved == nil then
     whoTrackerSaved = {}
-    WT.Print("Welcome to WhoTracker " .. version .. ":\n" ..
-      "type \"/wt query g-MyGuild\" for instance" .. 
-      " to start tracking characters in guild \"MyGuild\"" ..
-      " - \"/wt pause\" to stop tracking")
+    WT.Print("Welcome to WhoTracker " .. version .. ":\n" .. "type \"/wt query g-MyGuild\" for instance" ..
+               " to start tracking characters in guild \"MyGuild\"" .. " - \"/wt pause\" to stop tracking")
     whoTrackerSaved.query = "g-ChangeThis"
     whoTrackerSaved.paused = 1
     whoTrackerSaved.history = {}
@@ -236,7 +229,7 @@ function WT.Init()
   WT.whoLib = nil
   if LibStub then
     WT.whoLib = LibStub:GetLibrary('LibWho-2.0', true)
- end
+  end
   if WT.whoLib then
     WT.Debug("LibWho found!")
     if WT.debug then
@@ -270,10 +263,7 @@ function WT.WhoLibCallBack(query, results, complete)
   local res = {}
   for i = 1, totalCount do
     local info = results[i]
-    local data = {
-      level = info.Level,
-      zone = info.Zone,
-    }
+    local data = {level = info.Level, zone = info.Zone}
     table.insert(res, data)
   end
   WT.ProcessResult(totalCount, res)
@@ -283,17 +273,15 @@ end
 function WT.SendWho()
   if WT.whoLib then
     WT.Debug("Using WhoLib")
-    local opts = {
-      callback = WT.WhoLibCallBack
-    }
+    local opts = {callback = WT.WhoLibCallBack}
     WT.whoLib:Who(whoTrackerSaved.query, opts)
     return
   end
   if (WT.inQueryFlag == 1) or (#WT.registered > 0) or (#WT.unregistered > 0) then
     -- shouldn't happen... something is wrong/slow/... if it does, restore other handlers
     WT.inQueryFlag = 0
-    WT.Print("WhoTracker found unexpected state i=" .. WT.inQueryFlag .. " r=" ..
-                       #WT.registered .. " u=" .. #WT.unregistered, 1, .6, .6)
+    WT.Print("WhoTracker found unexpected state i=" .. WT.inQueryFlag .. " r=" .. #WT.registered .. " u=" .. #WT.unregistered, 1,
+             .6, .6)
     for i = 1, #WT.unregistered do
       WT.registered[i]:RegisterEvent("WHO_LIST_UPDATE")
     end
