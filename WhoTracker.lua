@@ -2,14 +2,16 @@
 -- Covered by the GNU General Public License version 3 (GPLv3)
 -- NO WARRANTY
 -- (contact the author if you need a different license)
-
-local addon, ns = ... -- our name, our empty default anonymous ns
+--
+-- our name, our empty default anonymous ns (not used):
+local addon, ns = ...
 
 -- Create table/namespace for most of this addon state
 -- and functions (whoTrackerSaved containing the rest)
 -- CreateFrame does create a namesake global class (table)
 -- which we'll extend.
-
+-- Note: this doesn't work if WhoTracker table already exists
+-- (like if MoLib.lua is loaded first instead of second)
 CreateFrame("frame", "WhoTracker", UIParent)
 
 -- Shortcut to not type WT everywhere
