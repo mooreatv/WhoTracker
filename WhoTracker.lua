@@ -94,7 +94,7 @@ SLASH_WhoTracker_Slash_Command1 = "/WhoTracker"
 SLASH_WhoTracker_Slash_Command2 = "/wt"
 
 function WT.OnEvent(this, event)
-  WT.Debug("called for % e=% q=% numr=% numur=%", this:GetName(), event, WT.inQueryFlag, #WT.registered, #WT.unregistered)
+  WT:Debug("called for % e=% q=% numr=% numur=%", this:GetName(), event, WT.inQueryFlag, #WT.registered, #WT.unregistered)
   if (event == "PLAYER_LOGIN") then
     WT.Ticker() -- initial query/init
     return
@@ -197,7 +197,7 @@ WT.prevStatus = "x"
 WT.inQueryFlag = 0
 
 function WT.Init()
-  if WT.MoLibInit() then -- already initialized
+  if WT:MoLibInit() then -- already initialized
     return
   end
   -- saved vars handling
@@ -225,7 +225,7 @@ function WT.Init()
   else
     WT.debug = nil
   end
-  WT.Debug("whoTrackerSaved = " .. WT.Dump(whoTrackerSaved))
+  WT:Debug("whoTrackerSaved = " .. WT.Dump(whoTrackerSaved))
   -- end save vars
   WT:RegisterEvent("PLAYER_LOGOUT")
   WT.whoLib = nil
@@ -233,17 +233,17 @@ function WT.Init()
     WT.whoLib = LibStub:GetLibrary('LibWho-2.0', true)
   end
   if WT.whoLib then
-    WT.Debug("LibWho found!")
+    WT:Debug("LibWho found!")
     if WT.debug then
       WT.whoLib:SetWhoLibDebug(true)
     end
   else
-    WT.Debug("LibWho not found!")
+    WT:Debug("LibWho not found!")
   end
 end
 
 function WT.Ticker()
-  WT.Debug("WhoTracker periodic ticker called")
+  WT:Debug("WhoTracker periodic ticker called")
   WT.Init()
   if not (whoTrackerSaved.paused == 1) then
     WT.SendWho()
@@ -259,8 +259,8 @@ end
 
 function WT.WhoLibCallBack(query, results, complete)
   -- WT.lastLR = results
-  WT.Debug("WhoLibCallBack q=% rsize % complete %", query, #results, complete)
-  -- WT.Debug("results is " .. WT.Dump(results)) 
+  WT:Debug("WhoLibCallBack q=% rsize % complete %", query, #results, complete)
+  -- WT:Debug("results is " .. WT.Dump(results)) 
   local totalCount = #results
   local res = {}
   for i = 1, totalCount do
@@ -274,7 +274,7 @@ end
 -- Now using WhoLib if it's here (and hopefully it's a working one)
 function WT.SendWho()
   if WT.whoLib then
-    WT.Debug("Using WhoLib")
+    WT:Debug("Using WhoLib")
     local opts = {callback = WT.WhoLibCallBack}
     WT.whoLib:Who(whoTrackerSaved.query, opts)
     return
@@ -301,9 +301,9 @@ function WT.SendWho()
     friendsFrame = WT.registered[i]
     local fname = friendsFrame:GetName()
     if fname == nil then
-      WT.Debug("who events registered to nil name #%", i)
+      WT:Debug("who events registered to nil name #%", i)
     else
-      WT.Debug("who events registered for % #%", fname, i)
+      WT:Debug("who events registered for % #%", fname, i)
     end
     friendsFrame:UnregisterEvent("WHO_LIST_UPDATE")
     table.insert(WT.unregistered, friendsFrame)
@@ -324,7 +324,7 @@ function WT.SendWho()
       else
         -- put it back
         friendsFrame:RegisterEvent("WHO_LIST_UPDATE")
-        WT.Debug("put back FriendsFrame event hdlr")
+        WT:Debug("put back FriendsFrame event hdlr")
       end
     end
   end
