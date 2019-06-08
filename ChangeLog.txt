@@ -1,7 +1,8 @@
 ChangeLog
 
-3.1.0 June 6th 2019
+3.1.0 June 7th 2019
     - MoLib is now using class type calls, updating call sites to match api change in 3.1.0
+	- See also https://github.com/mooreatv/MoLib/blob/master/ChangeLog.txt
 3.0.0 June 6th 2019
 	- Switching common code to MoLib
 2.1.7 June 6th 2019
