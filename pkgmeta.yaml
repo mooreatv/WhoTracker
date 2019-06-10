@@ -9,3 +9,5 @@ manual-changelog: ChangeLog.txt
 externals:
     MoLib:
         url: https://github.com/mooreatv/MoLib
+
+enable-nolib-creation: no
