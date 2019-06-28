@@ -1,5 +1,9 @@
 ChangeLog
 
+3.2.0 June 28th 2019
+	- Update to latest MoLib
+	- Use : consistently across the code here too.
+	- Bump interface version to match bfa patch 8.2 (still should work fine on classic)
 3.1.0 June 7th 2019
 	- MoLib is now using class type calls, updating call sites to match api change in 3.1.0
 	- See also https://github.com/mooreatv/MoLib/blob/master/ChangeLog.txt
