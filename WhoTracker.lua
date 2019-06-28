@@ -4,7 +4,7 @@
 -- (contact the author if you need a different license)
 --
 -- our name, our empty default anonymous ns (not used):
-local addon, ns = ...
+local addon, _ns = ...
 
 -- Create table/namespace for most of this addon state
 -- and functions (whoTrackerSaved containing the rest)
@@ -12,25 +12,25 @@ local addon, ns = ...
 -- which we'll extend.
 -- Note: this doesn't work if WhoTracker table already exists
 -- (like if MoLib.lua is loaded first instead of second)
-CreateFrame("frame", "WhoTracker", UIParent)
+CreateFrame("frame", addon, UIParent)
 
 -- Shortcut to not type WT everywhere
 
-local WT = WhoTracker
+local WT = _G[addon]
 
 -- to force debug from empty state, uncomment: (otherwise "/wt debug on" to turn on later
 -- and /reload to get it save/start over)
 -- WT.debug = 1
 
-function WT.Help(msg)
+function WT:Help(msg)
   WT:Print("WhoTracker: " .. msg .. "\n" .. "/wt pause --   stop tracking.\n" .. "/wt resume -- resume tracking\n" ..
              "/wt query ... -- who/what to track (n-playername z-zone g-guild c-class r-race lvl1-lvl2...)\n" ..
              "/wt history -- prints history")
 end
 
-function WT.Slash(arg)
+function WT.Slash(arg) -- exception to our pattern, doesn't use : notation because it's a slash callback
   if #arg == 0 then
-    WT.Help("commands")
+    WT:Help("commands")
     return
   end
   -- TODO: switch to/use tables
@@ -48,7 +48,7 @@ function WT.Slash(arg)
     -- resume
     whoTrackerSaved.paused = nil
     WT:Print("WhoTracker resuming tracking of " .. whoTrackerSaved.query)
-    WT.Ticker()
+    WT:Ticker()
   elseif cmd == "q" then
     -- query 
     whoTrackerSaved.query = rest
@@ -56,7 +56,7 @@ function WT.Slash(arg)
     WT:Print(msg)
     table.insert(whoTrackerSaved.history, msg)
     whoTrackerSaved.paused = nil
-    WT.Ticker()
+    WT:Ticker()
   elseif cmd == "h" then
     -- history
     WT:Print("WhoTracker history:")
@@ -82,9 +82,9 @@ function WT.Slash(arg)
     WT:Print("WhoTracker Debug OFF")
   elseif cmd == "d" then
     -- dump
-    WT:Print("WhoTrackerDump = " .. WT.Dump(_G[rest]))
+    WT:Print("WhoTrackerDump = " .. WT:Dump(_G[rest]))
   else
-    WT.Help("unknown command \"" .. arg .. "\", usage:")
+    WT:Help("unknown command \"" .. arg .. "\", usage:")
   end
 end
 
@@ -93,10 +93,10 @@ SlashCmdList["WhoTracker_Slash_Command"] = WT.Slash
 SLASH_WhoTracker_Slash_Command1 = "/WhoTracker"
 SLASH_WhoTracker_Slash_Command2 = "/wt"
 
-function WT.OnEvent(this, event)
+function WT.OnEvent(this, event) -- already has "this" and is an event handler so no :
   WT:Debug("called for % e=% q=% numr=% numur=%", this:GetName(), event, WT.inQueryFlag, #WT.registered, #WT.unregistered)
   if (event == "PLAYER_LOGIN") then
-    WT.Ticker() -- initial query/init
+    WT:Ticker() -- initial query/init
     return
   end
   if (event == "PLAYER_LOGOUT") then
@@ -124,12 +124,12 @@ function WT.OnEvent(this, event)
     local data = {level = levelNum, zone = info.area}
     table.insert(res, data)
   end
-  WT.ProcessResult(totalCount, res)
+  WT:ProcessResult(totalCount, res)
   WT.inQueryFlag = 0
 end
 
 -- Common part between libwho/no libwho:
-function WT.ProcessResult(totalCount, data)
+function WT:ProcessResult(totalCount, data)
   local status = ""
   local levels = {}
   local zones = {}
@@ -196,7 +196,7 @@ WT.refresh = 60
 WT.prevStatus = "x"
 WT.inQueryFlag = 0
 
-function WT.Init()
+function WT:Init()
   if WT:MoLibInit() then -- already initialized
     return
   end
@@ -211,7 +211,7 @@ function WT.Init()
     whoTrackerSaved.history = {}
   else
     if whoTrackerSaved.history == nil then
-      WT:Print("WhoTracker: warning - new history version/reset!")
+      WT:Warning("WhoTracker: warning - new history version/reset!")
       whoTrackerSaved.history = {}
     end
     if whoTrackerSaved.paused == 1 then
@@ -225,7 +225,7 @@ function WT.Init()
   else
     WT.debug = nil
   end
-  WT:Debug("whoTrackerSaved = " .. WT.Dump(whoTrackerSaved))
+  WT:Debug("whoTrackerSaved = " .. WT:Dump(whoTrackerSaved))
   -- end save vars
   WT:RegisterEvent("PLAYER_LOGOUT")
   WT.whoLib = nil
@@ -242,25 +242,25 @@ function WT.Init()
   end
 end
 
-function WT.Ticker()
+function WT:Ticker()
   WT:Debug("WhoTracker periodic ticker called")
-  WT.Init()
+  WT:Init()
   if not (whoTrackerSaved.paused == 1) then
-    WT.SendWho()
+    WT:SendWho()
   end
 end
 
-function WT.SetRegistered(...)
+function WT:SetRegistered(...)
   WT.registered = {}
   for i = 1, select("#", ...) do
     WT.registered[i] = select(i, ...)
   end
 end
 
-function WT.WhoLibCallBack(query, results, complete)
+function WT:WhoLibCallBack(query, results, complete)
   -- WT.lastLR = results
   WT:Debug("WhoLibCallBack q=% rsize % complete %", query, #results, complete)
-  -- WT:Debug("results is " .. WT.Dump(results)) 
+  -- WT:Debug("results is " .. WT:Dump(results)) 
   local totalCount = #results
   local res = {}
   for i = 1, totalCount do
@@ -268,11 +268,11 @@ function WT.WhoLibCallBack(query, results, complete)
     local data = {level = info.Level, zone = info.Zone}
     table.insert(res, data)
   end
-  WT.ProcessResult(totalCount, res)
+  WT:ProcessResult(totalCount, res)
 end
 
 -- Now using WhoLib if it's here (and hopefully it's a working one)
-function WT.SendWho()
+function WT:SendWho()
   if WT.whoLib then
     WT:Debug("Using WhoLib")
     local opts = {callback = WT.WhoLibCallBack}
@@ -294,7 +294,7 @@ function WT.SendWho()
     return
   end
   WT.inQueryFlag = 1
-  WT.SetRegistered(GetFramesRegisteredForEvent("WHO_LIST_UPDATE"))
+  WT:SetRegistered(GetFramesRegisteredForEvent("WHO_LIST_UPDATE"))
   WT.unregistered = {}
   local friendsFrame = nil
   for i = 1, #WT.registered do
