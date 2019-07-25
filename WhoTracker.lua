@@ -22,6 +22,8 @@ local WT = _G[addon]
 -- and /reload to get it save/start over)
 -- WT.debug = 1
 
+-- TODO: use all the new MoLib UI goodies to setup options panel, button etc...
+
 function WT:Help(msg)
   WT:Print("WhoTracker: " .. msg .. "\n" .. "/wt pause --   stop tracking.\n" .. "/wt resume -- resume tracking\n" ..
              "/wt query ... -- who/what to track (n-playername z-zone g-guild c-class r-race lvl1-lvl2...)\n" ..
@@ -50,7 +52,7 @@ function WT.Slash(arg) -- exception to our pattern, doesn't use : notation becau
     WT:Print("WhoTracker resuming tracking of " .. whoTrackerSaved.query)
     WT:Ticker()
   elseif cmd == "q" then
-    -- query 
+    -- query
     whoTrackerSaved.query = rest
     local msg = "WhoTracker now tracking " .. rest
     WT:Print(msg)
@@ -94,7 +96,8 @@ SLASH_WhoTracker_Slash_Command1 = "/WhoTracker"
 SLASH_WhoTracker_Slash_Command2 = "/wt"
 
 function WT.OnEvent(this, event) -- already has "this" and is an event handler so no :
-  WT:Debug("called for % e=% q=% numr=% numur=%", this:GetName(), event, WT.inQueryFlag, #WT.registered, #WT.unregistered)
+  WT:Debug("called for % e=% q=% numr=% numur=%", this:GetName(), event, WT.inQueryFlag, #WT.registered,
+           #WT.unregistered)
   if (event == "PLAYER_LOGIN") then
     WT:Ticker() -- initial query/init
     return
@@ -130,7 +133,6 @@ end
 
 -- Common part between libwho/no libwho:
 function WT:ProcessResult(totalCount, data)
-  local status = ""
   local levels = {}
   local zones = {}
   local minl = 999
@@ -158,11 +160,10 @@ function WT:ProcessResult(totalCount, data)
     end
   end
   local msg = ""
-  local level, count
   local first = 1
   table.sort(zoneList)
   for level = minl, maxl do
-    count = levels[level]
+    local count = levels[level]
     if not (count == nil) then
       if first == 1 then
         first = 0
@@ -197,6 +198,7 @@ WT.prevStatus = "x"
 WT.inQueryFlag = 0
 
 function WT:Init()
+  WT:Debug("Init called!")
   if WT:MoLibInit() then -- already initialized
     return
   end
@@ -217,7 +219,8 @@ function WT:Init()
     if whoTrackerSaved.paused == 1 then
       WT:Print("WhoTracker is paused.  /wt resume or /wt query [query] to resume.")
     else
-      WT:Print("WhoTracker " .. version .. " loaded.  Will track \"" .. whoTrackerSaved.query .. "\" - type /wt pause to stop .")
+      WT:Print("WhoTracker " .. version .. " loaded.  Will track \"" .. whoTrackerSaved.query ..
+                 "\" - type /wt pause to stop .")
     end
   end
   if whoTrackerSaved.debug then
@@ -260,7 +263,7 @@ end
 function WT:WhoLibCallBack(query, results, complete)
   -- WT.lastLR = results
   WT:Debug("WhoLibCallBack q=% rsize % complete %", query, #results, complete)
-  -- WT:Debug("results is " .. WT:Dump(results)) 
+  -- WT:Debug("results is " .. WT:Dump(results))
   local totalCount = #results
   local res = {}
   for i = 1, totalCount do
@@ -282,8 +285,8 @@ function WT:SendWho()
   if (WT.inQueryFlag == 1) or (#WT.registered > 0) or (#WT.unregistered > 0) then
     -- shouldn't happen... something is wrong/slow/... if it does, restore other handlers
     WT.inQueryFlag = 0
-    WT:Print("WhoTracker found unexpected state i=" .. WT.inQueryFlag .. " r=" .. #WT.registered .. " u=" .. #WT.unregistered, 1,
-             .6, .6)
+    WT:Print("WhoTracker found unexpected state i=" .. WT.inQueryFlag .. " r=" .. #WT.registered .. " u=" ..
+               #WT.unregistered, 1, .6, .6)
     for i = 1, #WT.unregistered do
       WT.registered[i]:RegisterEvent("WHO_LIST_UPDATE")
     end
