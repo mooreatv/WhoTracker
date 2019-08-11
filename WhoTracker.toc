@@ -1,4 +1,4 @@
-## Interface: 11302
+## Interface: 80200
 ## Title: WhoTracker
 ## Notes: Tracks /who result changes - type /wt for usage
 ## Author: moorea@ymail.com
