@@ -1,5 +1,9 @@
 ChangeLog
 
+3.2.2 Aug 11th 2019
+	- ignore unused parts of MoLib/update pkgmeta.yaml
+	- switching to separate classic/bfa zip (even if the only difference is the toc)
+	  using dynamicboxer's classictag.sh
 3.2.1 July 25th 2019
 	- minor luacheck cleanup
 3.2.0 June 28th 2019

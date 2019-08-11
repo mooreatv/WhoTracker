@@ -1,8 +1,12 @@
 ignore:
     - installwt.bat
+    - luaformat.cfg
     - MoLib/installmolib.bat
     - MoLib/MoLib.toc
     - MoLib/luaformat.cfg
+    - MoLib/README.md
+    - MoLib/tests
+    - MoLib/Realms.lua
 
 manual-changelog: ChangeLog.txt
 
