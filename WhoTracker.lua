@@ -14,7 +14,7 @@ local addon, _ns = ...
 -- (like if MoLib.lua is loaded first instead of second)
 CreateFrame("frame", addon, UIParent)
 
--- Shortcut to not type WT everywhere
+-- Shortcut to not type WhoTracker everywhere
 
 local WT = _G[addon]
 
